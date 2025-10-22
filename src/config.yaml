@@ -1,6 +1,6 @@
 site:
-  name: X by Ali
-  site: 'https://xbyali.com'
+  name: xbyali
+  site: 'https://xbyali.page'
   base: '/'
   trailingSlash: false
 
@@ -9,14 +9,14 @@ site:
 # Default SEO metadata
 metadata:
   title:
-    default: X by Ali
-    template: '%s - X by Ali'
-  description: 'Immersive brand experiences, digital storytelling, and crafted product launches.'
+    default: xbyali
+    template: '%s - xbyali'
+  description: 'a slow, growing archive. gatherings of fragments, reflections, and ongoing work.'
   robots:
     index: true
     follow: true
   openGraph:
-    site_name: X by Ali
+    site_name: xbyali
     images:
       - url: '~/assets/images/default.png'
         width: 1200

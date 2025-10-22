@@ -29,30 +29,41 @@ Repository: https://github.com/writingsbyali-hub/xbyali
 You need to add DNS records where you bought `xbyali.page` (e.g., Namecheap, Porkbun, etc.)
 
 **Add these 4 A records:**
-```
-Type: A
-Name: @ (or leave blank)
-Value: 185.199.108.153
 
-Type: A
-Name: @
-Value: 185.199.109.153
+Record 1:
+- Type: **A**
+- Host/Name: **@** (or leave blank)
+- Value/Points to: **185.199.108.153**
+- TTL: **3600** (or Auto/Default)
 
-Type: A
-Name: @
-Value: 185.199.110.153
+Record 2:
+- Type: **A**
+- Host/Name: **@**
+- Value/Points to: **185.199.109.153**
+- TTL: **3600**
 
-Type: A
-Name: @
-Value: 185.199.111.153
-```
+Record 3:
+- Type: **A**
+- Host/Name: **@**
+- Value/Points to: **185.199.110.153**
+- TTL: **3600**
+
+Record 4:
+- Type: **A**
+- Host/Name: **@**
+- Value/Points to: **185.199.111.153**
+- TTL: **3600**
 
 **Add a CNAME record for www:**
-```
-Type: CNAME
-Name: www
-Value: writingsbyali-hub.github.io
-```
+- Type: **CNAME**
+- Host/Name: **www**
+- Value/Points to: **writingsbyali-hub.github.io**
+- TTL: **3600** (or Auto/Default)
+
+**Note:** Different registrars use different terms:
+- "Host" = "Name" (same thing)
+- "Value" = "Points to" = "Target" (same thing)
+- TTL = Time To Live (how long DNS caches the record - 3600 is fine, or use default)
 
 ### C. Wait for DNS Propagation
 
