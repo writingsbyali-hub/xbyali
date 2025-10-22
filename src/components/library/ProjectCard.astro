@@ -1,0 +1,72 @@
+---
+export interface LibraryProjectItem {
+  id: string;
+  title: string;
+  excerpt?: string;
+  status?: string;
+  tags: string[];
+  technologies?: string[];
+  dateLabel?: string;
+  link: string;
+  gridSpan?: number;
+  searchIndex: string;
+}
+
+export interface Props {
+  item: LibraryProjectItem;
+}
+
+const { item } = Astro.props;
+const spanClass =
+  item.gridSpan && item.gridSpan > 1 ? 'sm:col-span-2 xl:col-span-6' : 'sm:col-span-1 xl:col-span-4';
+const tags = item.tags.filter(Boolean);
+const dataTags = tags.map((tag) => tag.toLowerCase()).join('|');
+const dataSearch = item.searchIndex ?? '';
+---
+
+<article
+  id={item.id}
+  class={`library-card col-span-1 flex flex-col gap-4 rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_25px_45px_-30px_rgba(15,23,42,0.35)] transition duration-300 hover:-translate-y-1 hover:border-neutral-900 dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none dark:hover:border-white ${spanClass}`}
+  data-library-item
+  data-type="project"
+  data-status={item.status?.toLowerCase() ?? ''}
+  data-tags={dataTags}
+  data-category=""
+  data-search={dataSearch}
+>
+  <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.3em] text-neutral-500 dark:text-neutral-400">
+    <span>Project</span>
+    {item.status && <span class="rounded-full border border-neutral-300 px-3 py-1 text-[10px] tracking-[0.25em] dark:border-neutral-600">{item.status}</span>}
+  </div>
+  <div class="space-y-3">
+    <h3 class="text-2xl font-semibold text-neutral-900 transition group-hover:text-neutral-600 dark:text-white dark:group-hover:text-neutral-100">
+      <a class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900" href={item.link}>
+        {item.title}
+      </a>
+    </h3>
+    {item.excerpt && <p class="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.excerpt}</p>}
+  </div>
+  <div class="mt-auto space-y-3">
+    {item.dateLabel && (
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-neutral-500 dark:text-neutral-400">
+        {item.dateLabel}
+      </p>
+    )}
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <button
+            type="button"
+            class="js-filter-tag inline-flex items-center rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-neutral-600 transition hover:bg-neutral-900 hover:text-white dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-white dark:hover:text-neutral-900"
+            data-tag={tag.toLowerCase()}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+  <a class="sr-only" href={item.link}>
+    View project {item.title}
+  </a>
+</article>

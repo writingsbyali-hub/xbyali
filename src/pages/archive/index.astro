@@ -1,0 +1,47 @@
+﻿---
+import Layout from '~/layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+import { getPermalink } from '~/utils/permalinks';
+
+const metadata = {
+  title: 'Archive - X by Ali',
+  description: 'Residencies, exhibitions, and research moments cataloged in the X by Ali archive.',
+};
+
+const archiveEntries = (await getCollection('archive'))
+  .slice()
+  .sort((a, b) => b.data.period.localeCompare(a.data.period));
+---
+<Layout metadata={metadata}>
+  <section class="mx-auto max-w-6xl px-6 py-24">
+    <div class="max-w-3xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.3em] text-neutral-500">Archive Series</p>
+      <h1 class="mt-4 text-4xl font-semibold text-neutral-900 dark:text-white">Archive</h1>
+      <p class="mt-4 text-base text-neutral-600 dark:text-neutral-300">
+        Quiet experiments, past residencies, and research collaborations that continue to inform how we build brand worlds today.
+      </p>
+    </div>
+    <div class="mt-14 grid gap-8 md:grid-cols-2">
+      {archiveEntries.map((entry) => (
+        <article class="flex h-full flex-col rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:border-neutral-900 dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none dark:hover:border-white">
+          <div class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500 dark:text-neutral-300">
+            <span>{entry.data.period}</span>
+            <span class="rounded-full border border-neutral-300 px-2 py-0.5 text-[10px] tracking-[0.2em] dark:border-neutral-600">
+              {entry.data.discipline}
+            </span>
+          </div>
+          <h2 class="mt-4 text-2xl font-semibold text-neutral-900 dark:text-white">{entry.data.title}</h2>
+          <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{entry.data.summary}</p>
+          <div class="mt-auto pt-6">
+            <a class="inline-flex items-center gap-2 text-sm font-semibold text-neutral-900 transition hover:gap-3 dark:text-white" href={entry.data.link ?? getPermalink('/archive')}>
+              View archive entry
+              <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</Layout>

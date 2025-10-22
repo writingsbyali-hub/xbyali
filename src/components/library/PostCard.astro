@@ -1,0 +1,74 @@
+---
+export interface LibraryPostItem {
+  id: string;
+  title: string;
+  excerpt?: string;
+  category?: string;
+  tags: string[];
+  dateLabel?: string;
+  link: string;
+  gridSpan?: number;
+  searchIndex: string;
+}
+
+export interface Props {
+  item: LibraryPostItem;
+}
+
+const { item } = Astro.props;
+const spanClass =
+  item.gridSpan && item.gridSpan > 1 ? 'sm:col-span-2 xl:col-span-6' : 'sm:col-span-1 xl:col-span-4';
+const tags = item.tags.filter(Boolean);
+const dataTags = tags.map((tag) => tag.toLowerCase()).join('|');
+const dataCategory = item.category?.toLowerCase() ?? '';
+const dataSearch = item.searchIndex ?? '';
+---
+
+<article
+  id={item.id}
+  class={`library-card col-span-1 flex flex-col gap-4 rounded-[2.5rem] border border-neutral-200 bg-neutral-50 p-6 shadow-inner transition duration-300 hover:-translate-y-1 hover:border-neutral-900 dark:border-neutral-800 dark:bg-neutral-900/70 dark:shadow-none dark:hover:border-white ${spanClass}`}
+  data-library-item
+  data-type="post"
+  data-status=""
+  data-tags={dataTags}
+  data-category={dataCategory}
+  data-search={dataSearch}
+>
+  <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.35em] text-neutral-500 dark:text-neutral-400">
+    <span>Essay</span>
+    {item.category && (
+      <span class="rounded-full border border-neutral-300 px-3 py-1 text-[10px] tracking-[0.3em] dark:border-neutral-600">
+        {item.category}
+      </span>
+    )}
+  </div>
+  <div class="space-y-4">
+    <h3 class="text-2xl font-semibold leading-tight text-neutral-900 transition group-hover:text-neutral-600 dark:text-white dark:group-hover:text-neutral-100">
+      <a class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-4 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-neutral-900" href={item.link}>
+        {item.title}
+      </a>
+    </h3>
+    {item.excerpt && <p class="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{item.excerpt}</p>}
+  </div>
+  <div class="mt-auto space-y-3">
+    {item.dateLabel && (
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-500 dark:text-neutral-400">{item.dateLabel}</p>
+    )}
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <button
+            type="button"
+            class="js-filter-tag inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-neutral-600 transition hover:bg-neutral-900 hover:text-white dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-white dark:hover:text-neutral-900"
+            data-tag={tag.toLowerCase()}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+  <a class="sr-only" href={item.link}>
+    Read essay {item.title}
+  </a>
+</article>

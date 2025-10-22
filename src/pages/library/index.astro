@@ -1,0 +1,257 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+import { getPermalink, BLOG_BASE } from '~/utils/permalinks';
+
+const metadata = {
+  title: 'Library - xbyali',
+  description: 'a slow, growing archive. projects, writings, fragments, and ongoing work.',
+};
+
+const [projectEntries, postEntries, archiveEntries, logEntries] = await Promise.all([
+  getCollection('projects'),
+  getCollection('post'),
+  getCollection('archive'),
+  getCollection('log'),
+]);
+
+const formatDate = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' });
+
+const toArray = (value) => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.flatMap(toArray);
+  return String(value)
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+// Normalize all entries to a common format
+const allItems = [
+  ...projectEntries.map((entry) => ({
+    id: `project-${entry.slug}`,
+    type: 'project',
+    title: entry.data.title,
+    excerpt: entry.data.excerpt ?? entry.data.summary,
+    tags: toArray(entry.data.technologies ?? entry.data.tags),
+    status: entry.data.status,
+    date: entry.data.launchDate ?? entry.data.date,
+    link: entry.data.link ?? `${getPermalink('/library')}#project-${entry.slug}`,
+    gridSpan: entry.data.grid_span ?? 1,
+  })),
+  ...postEntries.map((entry) => ({
+    id: `post-${entry.slug}`,
+    type: 'writing',
+    title: entry.data.title,
+    excerpt: entry.data.excerpt,
+    tags: toArray(entry.data.tags),
+    category: entry.data.category,
+    date: entry.data.publishDate ?? entry.data.date,
+    link: getPermalink([BLOG_BASE, entry.slug].filter(Boolean).join('/'), 'post'),
+    gridSpan: entry.data.grid_span ?? 1,
+  })),
+  ...archiveEntries.map((entry) => ({
+    id: `archive-${entry.slug}`,
+    type: 'archive',
+    title: entry.data.title,
+    excerpt: entry.data.excerpt ?? entry.data.summary,
+    tags: [...toArray(entry.data.discipline), ...toArray(entry.data.type)],
+    archiveType: entry.data.type,
+    date: entry.data.date,
+    link: entry.data.link ?? `${getPermalink('/library')}#archive-${entry.slug}`,
+    gridSpan: entry.data.grid_span ?? 1,
+  })),
+  ...logEntries.map((entry) => ({
+    id: `log-${entry.slug}`,
+    type: 'log',
+    title: entry.data.title,
+    excerpt: entry.body?.slice(0, 150),
+    tags: [],
+    date: entry.data.date,
+    link: `${getPermalink('/library')}#log-${entry.slug}`,
+    gridSpan: entry.data.grid_span ?? 1,
+  })),
+];
+
+// Sort by date, most recent first
+const sortedItems = allItems.sort((a, b) => {
+  const dateA = a.date ? new Date(a.date).valueOf() : 0;
+  const dateB = b.date ? new Date(b.date).valueOf() : 0;
+  return dateB - dateA;
+});
+
+// Collect all unique tags for the tag cloud
+const allTags = Array.from(
+  new Set(allItems.flatMap((item) => item.tags ?? []).filter(Boolean))
+).sort();
+---
+
+<Layout metadata={metadata}>
+  <!-- Header -->
+  <section class="w-full px-8 md:px-12 lg:px-16 py-16 md:py-24 border-b border-stone-200 dark:border-stone-800">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-xs font-medium uppercase tracking-[0.2em] text-primary mb-6">Library</p>
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-extralight text-stone-700 dark:text-stone-200 mb-6 leading-tight">
+        a slow, growing archive
+      </h1>
+      <p class="text-lg md:text-xl font-light text-stone-500 dark:text-stone-400 max-w-3xl leading-relaxed">
+        projects, writings, fragments, and ongoing work. {allItems.length} entries, connected through ideas.
+      </p>
+    </div>
+  </section>
+
+  <!-- Tag Cloud (optional - simple connection visualization) -->
+  <section class="w-full px-8 md:px-12 lg:px-16 py-12 bg-stone-50/50 dark:bg-stone-900/30 border-b border-stone-200 dark:border-stone-800">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-xs font-medium uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500 mb-6">Connections</p>
+      <div class="flex flex-wrap gap-3">
+        {allTags.map((tag) => (
+          <button
+            class="tag-filter px-4 py-2 text-sm font-light rounded-full border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:border-primary hover:text-primary transition-all duration-200"
+            data-tag={tag.toLowerCase()}
+          >
+            {tag}
+          </button>
+        ))}
+        <button
+          id="reset-filter"
+          class="px-4 py-2 text-sm font-light rounded-full bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-300 dark:hover:bg-stone-700 transition-all duration-200"
+        >
+          show all
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Library Grid -->
+  <section class="w-full px-8 md:px-12 lg:px-16 py-16 md:py-24">
+    <div class="max-w-7xl mx-auto">
+      <!-- Full-width masonry-inspired grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+        {sortedItems.map((item) => (
+          <article
+            class="library-card group relative flex flex-col rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900/50 hover:border-primary dark:hover:border-primary transition-all duration-300 overflow-hidden"
+            data-type={item.type}
+            data-tags={item.tags?.map(t => t.toLowerCase()).join('|')}
+            style={item.gridSpan > 1 ? `grid-column: span ${Math.min(item.gridSpan, 2)}` : ''}
+          >
+            <a href={item.link} class="absolute inset-0 z-10" aria-label={`View ${item.title}`}></a>
+
+            <div class="p-6 md:p-8 flex flex-col flex-1 space-y-4">
+              <!-- Type badge -->
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-medium uppercase tracking-[0.15em] text-primary">
+                  {item.type}
+                </span>
+                {item.date && (
+                  <time class="text-xs font-light text-stone-400 dark:text-stone-500">
+                    {formatDate.format(new Date(item.date))}
+                  </time>
+                )}
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-xl md:text-2xl font-light text-stone-800 dark:text-stone-100 leading-snug group-hover:text-primary transition-colors">
+                {item.title}
+              </h3>
+
+              <!-- Excerpt -->
+              {item.excerpt && (
+                <p class="text-sm font-light text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-3">
+                  {item.excerpt}
+                </p>
+              )}
+
+              <!-- Tags/Connections -->
+              {item.tags && item.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mt-auto pt-4 border-t border-stone-100 dark:border-stone-800">
+                  {item.tags.slice(0, 3).map((tag) => (
+                    <span class="text-xs font-light px-2 py-1 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
+                      {tag}
+                    </span>
+                  ))}
+                  {item.tags.length > 3 && (
+                    <span class="text-xs font-light text-stone-400">
+                      +{item.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <!-- Status for projects -->
+              {item.status && (
+                <span class="text-xs font-medium uppercase tracking-wider px-3 py-1 rounded-full bg-primary/10 text-primary w-fit">
+                  {item.status}
+                </span>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden text-center py-24">
+        <p class="text-lg font-light text-stone-400 dark:text-stone-500">
+          No entries match this filter. <button id="reset-from-empty" class="underline hover:text-primary transition-colors">Show all</button>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Simple tag filtering
+    const cards = document.querySelectorAll('.library-card');
+    const tagButtons = document.querySelectorAll('.tag-filter');
+    const resetButton = document.getElementById('reset-filter');
+    const resetFromEmpty = document.getElementById('reset-from-empty');
+    const emptyState = document.getElementById('empty-state');
+
+    let activeTag = null;
+
+    function filterCards(tag) {
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const cardTags = card.getAttribute('data-tags') || '';
+        const isVisible = !tag || cardTags.includes(tag);
+
+        card.style.display = isVisible ? '' : 'none';
+        if (isVisible) visibleCount++;
+      });
+
+      // Show/hide empty state
+      if (emptyState) {
+        emptyState.classList.toggle('hidden', visibleCount > 0);
+      }
+
+      // Update active state on buttons
+      tagButtons.forEach((btn) => {
+        const btnTag = btn.getAttribute('data-tag');
+        btn.classList.toggle('!border-primary', btnTag === tag);
+        btn.classList.toggle('!text-primary', btnTag === tag);
+      });
+    }
+
+    tagButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const tag = button.getAttribute('data-tag');
+        activeTag = activeTag === tag ? null : tag;
+        filterCards(activeTag);
+      });
+    });
+
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        activeTag = null;
+        filterCards(null);
+      });
+    }
+
+    if (resetFromEmpty) {
+      resetFromEmpty.addEventListener('click', () => {
+        activeTag = null;
+        filterCards(null);
+      });
+    }
+  </script>
+</Layout>

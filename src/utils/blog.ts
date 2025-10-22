@@ -40,6 +40,25 @@ const generatePermalink = async ({
     .join('/');
 };
 
+const toTagArray = (value: unknown): string[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value
+      .map((tag) => (typeof tag === 'string' ? tag : String(tag)))
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  return [String(value)].filter(Boolean);
+};
+
 const getNormalizedPost = async (post: CollectionEntry<'post'>): Promise<Post> => {
   const { id, data } = post;
   const { Content, remarkPluginFrontmatter } = await render(post);
@@ -50,7 +69,7 @@ const getNormalizedPost = async (post: CollectionEntry<'post'>): Promise<Post> =
     title,
     excerpt,
     image,
-    tags: rawTags = [],
+    tags: rawTags,
     category: rawCategory,
     author,
     draft = false,
@@ -68,7 +87,7 @@ const getNormalizedPost = async (post: CollectionEntry<'post'>): Promise<Post> =
       }
     : undefined;
 
-  const tags = rawTags.map((tag: string) => ({
+  const tags = toTagArray(rawTags).map((tag: string) => ({
     slug: cleanSlug(tag),
     title: tag,
   }));

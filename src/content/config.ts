@@ -56,15 +56,72 @@ const postCollection = defineCollection({
     title: z.string(),
     excerpt: z.string().optional(),
     image: z.string().optional(),
+    featured: z.boolean().optional(),
+    grid_span: z.number().int().positive().optional(),
 
     category: z.string().optional(),
-    tags: z.array(z.string()).optional(),
+    tags: z.union([z.array(z.string()), z.string()]).optional(),
     author: z.string().optional(),
+    date: z.union([z.string(), z.date()]).optional(),
 
+    metadata: metadataDefinition(),
+  }),
+});
+
+const projectCollection = defineCollection({
+  loader: glob({ pattern: ['**/*.{md,mdx}'], base: 'src/content/projects' }),
+  schema: z.object({
+    title: z.string(),
+    summary: z.string().optional(),
+    status: z.enum(['active', 'completed', 'Active', 'Completed']),
+    featured: z.boolean().optional(),
+    launchDate: z.date().optional(),
+    date: z.union([z.string(), z.date()]).optional(),
+    excerpt: z.string().optional(),
+    technologies: z.union([z.array(z.string()), z.string()]).optional(),
+    grid_span: z.number().int().positive().optional(),
+    link: z.string().url().optional(),
+    cover: z
+      .object({
+        src: z.string(),
+        alt: z.string(),
+      })
+      .optional(),
+    metadata: metadataDefinition(),
+  }),
+});
+
+const archiveCollection = defineCollection({
+  loader: glob({ pattern: ['**/*.{md,mdx}'], base: 'src/content/archive' }),
+  schema: z.object({
+    title: z.string(),
+    summary: z.string().optional(),
+    period: z.string().optional(),
+    discipline: z.string().optional(),
+    type: z.enum(['Poem', 'Manifesto', 'Technical Note']).optional(),
+    date: z.union([z.string(), z.date()]).optional(),
+    excerpt: z.string().optional(),
+    featured: z.boolean().optional(),
+    grid_span: z.number().int().positive().optional(),
+    link: z.string().url().optional(),
+    metadata: metadataDefinition(),
+  }),
+});
+
+const logCollection = defineCollection({
+  loader: glob({ pattern: ['**/*.{md,mdx}'], base: 'src/content/log' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.union([z.string(), z.date()]),
+    featured: z.boolean().optional(),
+    grid_span: z.number().int().positive().optional(),
     metadata: metadataDefinition(),
   }),
 });
 
 export const collections = {
   post: postCollection,
+  projects: projectCollection,
+  archive: archiveCollection,
+  log: logCollection,
 };

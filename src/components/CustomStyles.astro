@@ -25,19 +25,26 @@ import '@fontsource-variable/inter';
     --aw-font-serif: 'Inter Variable';
     --aw-font-heading: 'Inter Variable';
 
-    --aw-color-primary: rgb(1 97 239);
-    --aw-color-secondary: rgb(1 84 207);
-    --aw-color-accent: rgb(109 40 217);
+    /* Soft sage green - primary accent */
+    --aw-color-primary: rgb(158 171 149);
+    /* Warm taupe - secondary */
+    --aw-color-secondary: rgb(139 129 116);
+    /* Muted sage accent */
+    --aw-color-accent: rgb(158 171 149);
 
-    --aw-color-text-heading: rgb(0 0 0);
-    --aw-color-text-default: rgb(16 16 16);
-    --aw-color-text-muted: rgb(16 16 16 / 66%);
-    --aw-color-bg-page: rgb(255 255 255);
+    /* Soft charcoal for text */
+    --aw-color-text-heading: rgb(62 58 52);
+    --aw-color-text-default: rgb(82 77 69);
+    --aw-color-text-muted: rgb(120 112 102);
 
-    --aw-color-bg-page-dark: rgb(3 6 32);
+    /* Soft cream background - NOT white */
+    --aw-color-bg-page: rgb(253 253 248);
+
+    --aw-color-bg-page-dark: rgb(28 32 30);
 
     ::selection {
-      background-color: lavender;
+      background-color: rgba(158, 171, 149, 0.25);
+      color: rgb(62 58 52);
     }
   }
 
@@ -46,18 +53,23 @@ import '@fontsource-variable/inter';
     --aw-font-serif: 'Inter Variable';
     --aw-font-heading: 'Inter Variable';
 
-    --aw-color-primary: rgb(1 97 239);
-    --aw-color-secondary: rgb(1 84 207);
-    --aw-color-accent: rgb(109 40 217);
+    /* Softer sage in dark mode */
+    --aw-color-primary: rgb(158 171 149);
+    /* Warmer taupe in dark */
+    --aw-color-secondary: rgb(139 129 116);
+    --aw-color-accent: rgb(158 171 149);
 
-    --aw-color-text-heading: rgb(247, 248, 248);
-    --aw-color-text-default: rgb(229 236 246);
-    --aw-color-text-muted: rgb(229 236 246 / 66%);
-    --aw-color-bg-page: rgb(3 6 32);
+    /* Soft warm text on dark */
+    --aw-color-text-heading: rgb(238 235 229);
+    --aw-color-text-default: rgb(220 216 208);
+    --aw-color-text-muted: rgb(180 174 164);
+
+    /* Deep warm grey, not pure black */
+    --aw-color-bg-page: rgb(32 30 28);
 
     ::selection {
-      background-color: black;
-      color: snow;
+      background-color: rgba(158, 171, 149, 0.3);
+      color: rgb(238 235 229);
     }
   }
 </style>
